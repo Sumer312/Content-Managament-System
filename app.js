@@ -54,20 +54,30 @@ app.get(`/compose`, (req,res)=>{
 })
 
 app.post(`/compose`, (req,res)=>{
-  const img = req.files.postImg;
-  cloudinary.uploader.upload(img.tempFilePath, (err, result) => {
+  try{
+    const img = req.files.postImg;
+    cloudinary.uploader.upload(img.tempFilePath, (err, result) => {
     console.log(result);
     const Post = new blogmod({
+      title:  req.body.posttitle,
+      img : result.url,
+      content : req.body.postbody
+ })
+ Post.save((err) => {
+  if(!err) res.redirect(`/`);
+})
+})
+}
+catch(e) {
+  const Post = new blogmod({
     title:  req.body.posttitle,
-    img : result.url,
+    img : null,
     content : req.body.postbody
  })
  Post.save((err) => {
   if(!err) res.redirect(`/`);
  });
-  })
-  
-  
+} 
 })
 
 app.get(`/posts/:postId`,(req,res)=>{
